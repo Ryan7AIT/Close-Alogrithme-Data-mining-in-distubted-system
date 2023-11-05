@@ -21,6 +21,17 @@ def close(dataset,minsup):
 
         support = count / len(dataset)
         return support
+    
+
+    def calculate_Count(dataset, item):
+        item = item.split(',')  # Split the input string into a list
+
+        count = 0
+        for transaction in dataset:
+            if all(i in transaction for i in item):
+                count += 1
+
+        return count
 
 
     def filter_items_by_minsup(results_df, minsup):
@@ -141,8 +152,10 @@ def close(dataset,minsup):
         # Calculate and store the support for each item in the candidate list
         for item in candidate:
             support = calculate_support(dataset, item) 
+            count = calculate_Count(dataset, item) 
+
             closure = get_closure(item, dataset)
-            results.append({'Item': item, 'Support': support,'Closure': closure})
+            results.append({'Item': item, 'Support': support,'Closure': closure, 'Count': count})
 
         # Create a DataFrame from the list of dictionaries
         results_df = pd.DataFrame(results)
@@ -228,8 +241,17 @@ def close(dataset,minsup):
 
     # Output the DataFrame
 
-
+    print(returnValue)
 
 
     return returnValue
 
+
+dataset = [['A', 'B', 'C', 'D', 'E'],
+           ['A', 'B'],
+           ['C', 'E'],
+           ['A', 'B', 'D', 'E'],
+           ['A', 'C', 'D']]
+    
+
+close(dataset,0.4)
