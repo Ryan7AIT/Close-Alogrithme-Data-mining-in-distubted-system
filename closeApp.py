@@ -4,8 +4,10 @@ from tkinter import filedialog
 import csv
 from close import close
 from dClose import dClose
+from dClose import extract_association_rules
 from tkinter import ttk
 import math
+import pandas as pd
 
 #input : minsup&&database
 
@@ -162,8 +164,13 @@ class MyWindow:
         d1 = [['A', 'B', 'C', 'D', 'E'],['A','B']]
         d3= [['C', 'E'], ['A', 'B', 'D', 'E'], ['A', 'C', 'D']]
         df1,df2,df3 = dClose([database1,database2],minsup)
-        print('df1:====')
-        print(df1)  
+        print('df111111111111111')
+        print(df1)
+
+
+
+        print('df3:====')
+        print(df3)  
         # print(df2)
 
 
@@ -196,7 +203,7 @@ class MyWindow:
 
 
         tv3 = ttk.Treeview(self.frame3)
-        column_list_account = ["Rule", "Count"]
+        column_list_account = ["Rule", "Support","closure","Count"]
         tv3['columns'] = column_list_account
         tv3["show"] = "headings"  # removes empty column
         for column in column_list_account:
@@ -209,6 +216,20 @@ class MyWindow:
         treescroll.pack(side="right", fill="y")
 
 
+
+
+        tv4 = ttk.Treeview(self.frame4)
+        column_list_account = ["Rule", "Count"]
+        tv4['columns'] = column_list_account
+        tv4["show"] = "headings"  # removes empty column
+        for column in column_list_account:
+            tv4.heading(column, text=column)
+            tv4.column(column, width=50)
+        tv4.place(relheight=10, relwidth=0.995)
+        treescroll = ttk.Scrollbar(self.frame4)
+        treescroll.configure(command=tv4.yview)
+        tv4.configure(yscrollcommand=treescroll.set)
+        treescroll.pack(side="right", fill="y")
 
 
 
@@ -226,12 +247,69 @@ class MyWindow:
 
         df_no_duplicates = df3.drop_duplicates(subset=['Item'])
         self.dflist = df_no_duplicates.values.tolist()
+        print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+        print(self.dflist)
         for row in self.dflist:
                 tv3.insert("", "end", values=row)
 
 
-        print('df333')
-        print(df3)
+        print('df 3 no duplicate: ')
+        print(df_no_duplicates)
+
+
+        item_closures = {}
+        for index, row in df_no_duplicates.iterrows():
+            item = row['Item']
+            closure = row['Closure']
+            
+            # Extract values from the closure, excluding the item itself
+            closure_values = [val for val in closure if val != item]
+            
+            # Store the item and its closure values in the dictionary
+            item_closures[item] = closure_values
+
+        print('new function to rules')
+
+
+        result_list = [f"{item}->{', '.join(closures)}" for item, closures in item_closures.items() if closures]
+
+        result_str = ', '.join(result_list)
+
+
+        print(result_str)
+
+        print('Associative urle glab')
+        assoc_rule_list  = extract_association_rules(df_no_duplicates)
+        rules_list = [item for sublist in assoc_rule_list for item in sublist]
+        result_list = [[item] + closures for item, closures in item_closures.items()]
+
+        df_rules = pd.DataFrame({'Rule': rules_list})
+
+
+        self.dflist = result_list
+        for row in self.dflist:
+                tv4.insert("", "end", values=row)
+
+
+        # def calculate_lift_from_rule(rule):
+        #     rule_parts = rule.split(' -> ')
+        #     rule_part1, rule_part2 = rule_parts[0], rule_parts[1]
+        #     support_rule1_and_rule2 = calculate_support(dataset, (rule_part1 +','+ rule_part2))
+        #     support_rule1 = calculate_support(dataset, rule_part1)
+        #     support_rule2 = calculate_support(dataset, rule_part2)
+        #     if (support_rule1 * support_rule2)==0:
+        #         lift_value = 0
+        #     else :
+        #         lift_value = support_rule1_and_rule2 /((support_rule1 * support_rule2*1.07))
+        #     return lift_value
+
+        # df_rules['Confidence'] = df_rules['Rule'].apply(lambda x: confiance(x.split(' -> ')[0],x.split(' -> ')[1]))
+        df_rules['Confidence'] = 1
+
+        # df_rules['Lift'] = df_rules['Rule'].apply(lambda x: lift(x.split(' -> ')[0],x.split(' -> ')[1]))
+        # df_rules['Lift'] = df_rules['Rule'].apply(calculate_lift_from_rule)
+
+        # print(df_rules)
         
         
         # self.t6.insert(END, str(xi[0])  + ' , '  + str(xi[1]) + ' , '  + str(xi[2]) + ' , '  + str(xi[3]) + ' , '  + str(xi[4])   )
@@ -259,6 +337,7 @@ mywin=MyWindow(window)
 window.title('Close Algorithm')
 window.geometry("900x600")
 window.mainloop()
+
 
 
 
