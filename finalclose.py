@@ -20,7 +20,7 @@ def close(dataset,minsup):
                 count += 1
 
         support = count / len(dataset)
-        return support
+        return round(support,2)
     
 
     def calculate_Count(dataset, item):
@@ -31,7 +31,7 @@ def close(dataset,minsup):
             if all(i in transaction for i in item):
                 count += 1
 
-        return count
+        return int(count)
 
 
     def filter_items_by_minsup(results_df, minsup):
