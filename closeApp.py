@@ -63,16 +63,16 @@ class MyWindow:
         
 
         self.frame1 = LabelFrame(window, text="Local frequent item set for the first Daatabase")
-        self.frame1.place(rely=0.4, relx=0.2, height=300, width=300)
+        self.frame1.place(rely=0.4, relx=0.2, height=300, width=200)
 
         self.frame2 = LabelFrame(window, text="Local frequent item set for the second Daatabase")
-        self.frame2.place(rely=0.4, relx=0.4, height=300, width=300)
+        self.frame2.place(rely=0.4, relx=0.4, height=300, width=200)
 
-        self.frame3 = LabelFrame(window, text="Gloabl frequent item set for the first Daatabase")
+        self.frame3 = LabelFrame(window, text="Gloabl frequent items")
         self.frame3.place(rely=0.4, relx=0.6, height=300, width=300)
 
 
-        self.frame4 = LabelFrame(window, text="Global Associative rules")
+        self.frame4 = LabelFrame(window, text="Associative rules")
         self.frame4.place(rely=0.4, relx=0.8, height=300, width=300)
 
 
@@ -171,6 +171,12 @@ class MyWindow:
 
         print('df3:====')
         print(df3)  
+
+
+        df3 = df3.drop('Support', axis=1)
+
+
+
         # print(df2)
 
 
@@ -180,7 +186,7 @@ class MyWindow:
         tv1["show"] = "headings"  # removes empty column
         for column in column_list_account:
             tv1.heading(column, text=column)
-            tv1.column(column, width=50)
+            tv1.column(column, width=40)
         tv1.place(relheight=10, relwidth=0.995)
         treescroll = ttk.Scrollbar(self.frame1)
         treescroll.configure(command=tv1.yview)
@@ -194,7 +200,7 @@ class MyWindow:
         tv2["show"] = "headings"  # removes empty column
         for column in column_list_account:
             tv2.heading(column, text=column)
-            tv2.column(column, width=50)
+            tv2.column(column, width=40)
         tv2.place(relheight=10, relwidth=0.995)
         treescroll = ttk.Scrollbar(self.frame2)
         treescroll.configure(command=tv2.yview)
@@ -203,7 +209,7 @@ class MyWindow:
 
 
         tv3 = ttk.Treeview(self.frame3)
-        column_list_account = ["Rule", "Support","closure","Count"]
+        column_list_account = ["Rule","closure","Count"]
         tv3['columns'] = column_list_account
         tv3["show"] = "headings"  # removes empty column
         for column in column_list_account:
@@ -219,7 +225,7 @@ class MyWindow:
 
 
         tv4 = ttk.Treeview(self.frame4)
-        column_list_account = ["Rule", "Count"]
+        column_list_account = ["Item","    =>"," "]
         tv4['columns'] = column_list_account
         tv4["show"] = "headings"  # removes empty column
         for column in column_list_account:
@@ -246,6 +252,8 @@ class MyWindow:
 
 
         df_no_duplicates = df3.drop_duplicates(subset=['Item'])
+
+
         self.dflist = df_no_duplicates.values.tolist()
         print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
         print(self.dflist)
@@ -276,19 +284,41 @@ class MyWindow:
         result_str = ', '.join(result_list)
 
 
-        print(result_str)
+        print(result_list)
 
         print('Associative urle glab')
         assoc_rule_list  = extract_association_rules(df_no_duplicates)
+
         rules_list = [item for sublist in assoc_rule_list for item in sublist]
         result_list = [[item] + closures for item, closures in item_closures.items()]
 
         df_rules = pd.DataFrame({'Rule': rules_list})
 
+        print(assoc_rule_list)
 
-        self.dflist = result_list
-        for row in self.dflist:
+
+
+        #insert !!!!!!!!!!! into the table:
+        self.dflist = pd.DataFrame(data, columns=["List","list2","liost3"])
+
+        self.dflist = self.dflist.drop('list2', axis=1)
+        self.dflist =df1.values.tolist()
+
+        assoc_rule_list = [item for item in assoc_rule_list if item.split('->')[0].replace(" ", "") != item.split('->')[1].replace(" ", "")]
+
+
+        assoc_rule_list = [item for item in assoc_rule_list if item.split('->')[1].strip()]
+
+        print('new')
+        print(assoc_rule_list)
+
+        print(self.dflist)
+        for row in assoc_rule_list:
                 tv4.insert("", "end", values=row)
+
+
+        # for index, row in self.dflist.iterrows():
+        #     self.tv4.insert("", "end", values=(row["List"],))
 
 
         # def calculate_lift_from_rule(rule):
