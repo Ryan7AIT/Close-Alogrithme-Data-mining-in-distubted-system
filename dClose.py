@@ -133,7 +133,7 @@ def dClose(databases,minsup):
 
     #filter c_bar again by minsup
     print("golbaly frequent items:")
-    filtered_items = result_df[result_df['Count'] >= 0]
+    filtered_items = result_df[result_df['Count'] >= minsup*(len(databases))]
 
     print(filtered_items)
     # filtered_items = filtered_items.drop('Support', axis=1)
